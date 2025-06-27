@@ -22,39 +22,31 @@ app.use(cors({
 app.use(express.static('public'));  // Para servir arquivos estáticos, como HTML, CSS e JS
 app.use(express.json()); // Permite que o express leia o corpo da requisição no formato JSON
 
-// Armazenando as mensagens dos emissores
+// Armazenando as mensagens dos emissores e os receptores
 let mensagens = [];
 let emissores = [];
+let receptores = [];
 let tempoInicial = null;  // Para armazenar o tempo da primeira mensagem
 let timeoutID = null;  // ID para o setTimeout que limpa as mensagens após 10s
 
-// Endpoint para criar emissores
-app.post('/criar-emissores', (req, res) => {
+// Endpoint para criar receptores
+app.post('/criar-receptores', (req, res) => {
     const { quantidade } = req.body;
 
-    // Cria emissores com nomes automáticos
+    // Cria receptores com nomes automáticos
     for (let i = 1; i <= quantidade; i++) {
-        emissores.push({ id: i, nome: `Emissor-${i}` });
+        receptores.push({ id: i, nome: `Receptor-${i}` });
     }
 
-    res.status(200).send({ status: 'Emissores criados com sucesso!', emissores });
+    res.status(200).send({ status: 'Receptores criados com sucesso!', receptores });
 });
 
 // Endpoint para emissores enviarem mensagens
 app.post('/enviar', (req, res) => {
     const { mensagem, emissorId } = req.body;
-
-    if (!mensagem || !emissorId) {
-        return res.status(400).send({ error: 'Mensagem e emissor são obrigatórios.' });
-    }
-
-    const emissor = emissores.find(e => e.id === emissorId);
-    if (!emissor) {
-        return res.status(404).send({ error: 'Emissor não encontrado.' });
-    }
-
+    
     // Armazenando a mensagem com a identificação do emissor
-    mensagens.push({ mensagem, emissor: emissor.nome, timestamp: Date.now() });
+    mensagens.push({ mensagem, emissor: emissorId, timestamp: Date.now() });
 
     // Se for a primeira mensagem, armazena o tempo
     if (!tempoInicial) {
@@ -65,7 +57,8 @@ app.post('/enviar', (req, res) => {
         clearTimeout(timeoutID);  // Limpar qualquer temporizador anterior
         timeoutID = setTimeout(() => {
             console.log('10 segundos se passaram, enviando mensagens...');
-            io.emit('mensagens', mensagens);  // Envia as mensagens para os receptores
+            // Envia as mensagens para todos os receptores
+            io.emit('mensagens', { mensagens, receptores });
             mensagens = [];  // Limpa a lista de mensagens
             tempoInicial = null;  // Reinicia o tempo para esperar uma nova primeira mensagem
         }, 10000);  // Configura o timeout para 10 segundos

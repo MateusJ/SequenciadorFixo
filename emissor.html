@@ -18,20 +18,14 @@
     <script>
         let emissores = [];
 
-        // Criar emissores no backend
+        // Criar emissores diretamente na página
         function criarEmissores() {
             const quantidade = document.getElementById('quantidadeEmissores').value;
-            fetch('http://localhost:3000/criar-emissores', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ quantidade })
-            })
-            .then(response => response.json())
-            .then(data => {
-                emissores = data.emissores;
-                displayEmissores();
-            })
-            .catch(error => console.error('Erro ao criar emissores:', error));
+            emissores = []; // Limpa os emissores antigos
+            for (let i = 1; i <= quantidade; i++) {
+                emissores.push({ id: i, nome: `Emissor-${i}` });
+            }
+            displayEmissores();
         }
 
         // Exibir emissores
@@ -60,6 +54,7 @@
                 body: JSON.stringify({ mensagem, emissorId })
             })
             .then(response => response.json())
+            .then(data => console.log(data.status))
             .catch(error => console.error('Erro ao enviar mensagem:', error));
         }
     </script>

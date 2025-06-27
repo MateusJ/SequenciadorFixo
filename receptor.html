@@ -5,25 +5,109 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Página dos Receptores</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+    <style>
+        .receptor {
+            border: 2px solid #000;
+            margin: 10px;
+            padding: 10px;
+            width: 250px;
+        }
+
+        .mensagens {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .mensagem {
+            background-color: #f4f4f4;
+            margin: 5px 0;
+            padding: 5px;
+        }
+
+        .receptores-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .receptor-container {
+            margin: 10px;
+        }
+    </style>
 </head>
 <body>
     <h1>Grupo de Receptores</h1>
     
-    <ul id="mensagensRecebidas"></ul>
+    <!-- Definir quantidade de receptores -->
+    <input type="number" id="quantidadeReceptores" placeholder="Quantidade de receptores">
+    <button onclick="criarReceptores()">Criar Receptores</button>
+    
+    <div id="receptores" class="receptores-container"></div>
 
     <script>
+        let receptores = [];
+
+        // Criar receptores diretamente na página
+        function criarReceptores() {
+            const quantidade = document.getElementById('quantidadeReceptores').value;
+            receptores = []; // Limpa os receptores antigos
+            const receptoresDiv = document.getElementById('receptores');
+            receptoresDiv.innerHTML = ''; // Limpa a área de receptores
+
+            // Cria receptores e adiciona um bloco para cada um
+            for (let i = 1; i <= quantidade; i++) {
+                const receptor = { id: i, nome: `Receptor-${i}`, mensagens: [] };
+                receptores.push(receptor);
+
+                // Cria um bloco para cada receptor
+                const receptorDiv = document.createElement('div');
+                receptorDiv.classList.add('receptor-container');
+
+                const receptorBloco = document.createElement('div');
+                receptorBloco.classList.add('receptor');
+                receptorBloco.setAttribute('id', `receptor-${i}`);
+
+                const receptorTitle = document.createElement('h3');
+                receptorTitle.textContent = receptor.nome;
+
+                const mensagensList = document.createElement('ul');
+                mensagensList.classList.add('mensagens');
+                mensagensList.setAttribute('id', `mensagens-${i}`);
+
+                receptorBloco.appendChild(receptorTitle);
+                receptorBloco.appendChild(mensagensList);
+                receptorDiv.appendChild(receptorBloco);
+                receptoresDiv.appendChild(receptorDiv);
+            }
+        }
+
         const socket = io('http://localhost:3000');
 
-        socket.on('mensagens', function(mensagens) {
-            const lista = document.getElementById('mensagensRecebidas');
-            lista.innerHTML = ''; // Limpa a lista antes de exibir novas mensagens
-
-            mensagens.forEach(mensagem => {
-                const item = document.createElement('li');
-                item.textContent = `${mensagem.emissor}: ${mensagem.mensagem}`;
-                lista.appendChild(item);
+        // Evento de recebimento de mensagens
+        socket.on('mensagens', function(data) {
+            // Para cada receptor, exibe as mensagens recebidas no bloco correspondente
+            data.mensagens.forEach(mensagem => {
+                // Todos os receptores recebem as mesmas mensagens
+                receptores.forEach(receptor => {
+                    // Adiciona a mensagem ao receptor
+                    receptor.mensagens.push(mensagem);
+                    displayMensagens(receptor.id);
+                });
             });
         });
+
+        // Exibir mensagens de um receptor específico
+        function displayMensagens(receptorId) {
+            const receptor = receptores.find(r => r.id === receptorId);
+            const mensagensList = document.getElementById(`mensagens-${receptorId}`);
+            mensagensList.innerHTML = ''; // Limpa as mensagens anteriores
+
+            receptor.mensagens.forEach(mensagem => {
+                const item = document.createElement('li');
+                item.classList.add('mensagem');
+                item.textContent = `${mensagem.emissor}: ${mensagem.mensagem}`;
+                mensagensList.appendChild(item);
+            });
+        }
     </script>
 </body>
 </html>
