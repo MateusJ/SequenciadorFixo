@@ -1,10 +1,18 @@
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
+const cors = require('cors'); // Importando o CORS
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = socketIo(server, {
+  cors: {
+    origin: "http://127.0.0.1:8080",  // Permite conexões apenas de http://127.0.0.1:8080
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type"],
+    credentials: true
+  }
+});
 
 // Armazenando mensagens dos emissores
 let mensagens = [];
@@ -12,8 +20,12 @@ let mensagens = [];
 // Middleware para ler JSON
 app.use(express.json());
 
+// Ativando o CORS para permitir requisições de qualquer origem
+app.use(cors());  // Habilita CORS para todos os domínios
+
 // Endpoint para emissores enviarem mensagens
 app.post('/enviar', (req, res) => {
+    console.log('Requisição recebida:', req.body);
     const { mensagem, emissor } = req.body;
     
     if (!mensagem || !emissor) {
@@ -33,7 +45,7 @@ setInterval(() => {
         io.emit('mensagens', mensagensSequenciadas); // Envia para todos os clientes conectados
         mensagens = []; // Limpa a lista após envio
     }
-}, 5000); // Intervalo de 5 segundos
+}, 10000); // Intervalo de 5 segundos
 
 // Inicia o servidor
 server.listen(3000, () => {
