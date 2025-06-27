@@ -1,0 +1,46 @@
+# Diretórios padrão
+node_modules/
+dist/
+build/
+tmp/
+temp/
+
+# Arquivos de log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Ambiente e sistema
+.env
+.env.*.local
+.DS_Store
+Thumbs.db
+
+# Cache
+.cache/
+.nyc_output/
+coverage/
+.vscode/
+
+# Testes
+jest-coverage/
+*.test.ts.snap
+
+# Dependências lock (caso queira ignorar)
+# package-lock.json
+
+# Outras ferramentas (caso usadas)
+.eslintcache
+.parcel-cache/
+.next/
+out/
+.svelte-kit/
+.storybook/
+.cypress/
+
+# Arquivos do sistema
+*.swp
+*.swo
+.idea/
+*.iml
