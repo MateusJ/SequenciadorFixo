@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página dos Receptores</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>Grupo de Receptores</h1>
+    
+    <ul id="mensagensRecebidas"></ul>
+
+    <script>
+        const socket = io('http://localhost:3000');
+
+        socket.on('mensagens', function(mensagens) {
+            const lista = document.getElementById('mensagensRecebidas');
+            lista.innerHTML = ''; // Limpa a lista antes de exibir novas mensagens
+
+            mensagens.forEach(mensagem => {
+                const item = document.createElement('li');
+                item.textContent = `${mensagem.emissor}: ${mensagem.mensagem}`;
+                lista.appendChild(item);
+            });
+        });
+    </script>
+</body>
+</html>

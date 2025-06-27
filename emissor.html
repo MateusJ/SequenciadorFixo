@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página dos Emissores</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>Grupo de Emissores</h1>
+    
+    <!-- Definir quantidade de emissores -->
+    <input type="number" id="quantidadeEmissores" placeholder="Quantidade de emissores">
+    <button onclick="criarEmissores()">Criar Emissores</button>
+    
+    <div id="emissores"></div>
+
+    <script>
+        let emissores = [];
+
+        // Criar emissores no backend
+        function criarEmissores() {
+            const quantidade = document.getElementById('quantidadeEmissores').value;
+            fetch('http://localhost:3000/criar-emissores', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ quantidade })
+            })
+            .then(response => response.json())
+            .then(data => {
+                emissores = data.emissores;
+                displayEmissores();
+            })
+            .catch(error => console.error('Erro ao criar emissores:', error));
+        }
+
+        // Exibir emissores
+        function displayEmissores() {
+            const emissoresDiv = document.getElementById('emissores');
+            emissoresDiv.innerHTML = '';
+            
+            emissores.forEach(emissor => {
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <h3>${emissor.nome}</h3>
+                    <input type="text" id="mensagem-${emissor.id}" placeholder="Escreva sua mensagem">
+                    <button onclick="enviarMensagem(${emissor.id})">Enviar Mensagem</button>
+                `;
+                emissoresDiv.appendChild(div);
+            });
+        }
+
+        // Enviar mensagem de um emissor
+        function enviarMensagem(emissorId) {
+            const mensagem = document.getElementById(`mensagem-${emissorId}`).value;
+
+            fetch('http://localhost:3000/enviar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ mensagem, emissorId })
+            })
+            .then(response => response.json())
+            .catch(error => console.error('Erro ao enviar mensagem:', error));
+        }
+    </script>
+</body>
+</html>
