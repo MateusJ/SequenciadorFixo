@@ -9,7 +9,6 @@
 <body>
     <h1>Grupo de Emissores</h1>
     
-    <!-- Definir quantidade de emissores -->
     <input type="number" id="quantidadeEmissores" placeholder="Quantidade de emissores">
     <button onclick="criarEmissores()">Criar Emissores</button>
     
@@ -18,17 +17,15 @@
     <script>
         let emissores = [];
 
-        // Criar emissores diretamente na página
         function criarEmissores() {
             const quantidade = document.getElementById('quantidadeEmissores').value;
-            emissores = []; // Limpa os emissores antigos
+            emissores = []; 
             for (let i = 1; i <= quantidade; i++) {
                 emissores.push({ id: i, nome: `Emissor-${i}` });
             }
             displayEmissores();
         }
 
-        // Exibir emissores
         function displayEmissores() {
             const emissoresDiv = document.getElementById('emissores');
             emissoresDiv.innerHTML = '';
@@ -44,7 +41,6 @@
             });
         }
 
-        // Enviar mensagem de um emissor
         function enviarMensagem(emissorId) {
             const mensagem = document.getElementById(`mensagem-${emissorId}`).value;
 

@@ -37,7 +37,6 @@
 <body>
     <h1>Grupo de Receptores</h1>
     
-    <!-- Definir quantidade de receptores -->
     <input type="number" id="quantidadeReceptores" placeholder="Quantidade de receptores">
     <button onclick="criarReceptores()">Criar Receptores</button>
     
@@ -46,19 +45,16 @@
     <script>
         let receptores = [];
 
-        // Criar receptores diretamente na página
         function criarReceptores() {
             const quantidade = document.getElementById('quantidadeReceptores').value;
-            receptores = []; // Limpa os receptores antigos
+            receptores = []; 
             const receptoresDiv = document.getElementById('receptores');
-            receptoresDiv.innerHTML = ''; // Limpa a área de receptores
+            receptoresDiv.innerHTML = '';
 
-            // Cria receptores e adiciona um bloco para cada um
             for (let i = 1; i <= quantidade; i++) {
                 const receptor = { id: i, nome: `Receptor-${i}`, mensagens: [] };
                 receptores.push(receptor);
 
-                // Cria um bloco para cada receptor
                 const receptorDiv = document.createElement('div');
                 receptorDiv.classList.add('receptor-container');
 
@@ -82,24 +78,19 @@
 
         const socket = io('http://localhost:3000');
 
-        // Evento de recebimento de mensagens
         socket.on('mensagens', function(data) {
-            // Para cada receptor, exibe as mensagens recebidas no bloco correspondente
             data.mensagens.forEach(mensagem => {
-                // Todos os receptores recebem as mesmas mensagens
                 receptores.forEach(receptor => {
-                    // Adiciona a mensagem ao receptor
                     receptor.mensagens.push(mensagem);
                     displayMensagens(receptor.id);
                 });
             });
         });
 
-        // Exibir mensagens de um receptor específico
         function displayMensagens(receptorId) {
             const receptor = receptores.find(r => r.id === receptorId);
             const mensagensList = document.getElementById(`mensagens-${receptorId}`);
-            mensagensList.innerHTML = ''; // Limpa as mensagens anteriores
+            mensagensList.innerHTML = ''; 
 
             receptor.mensagens.forEach(mensagem => {
                 const item = document.createElement('li');
